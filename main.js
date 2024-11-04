@@ -67,7 +67,7 @@ function CreateSurfaceData()
     let vertexList = [];
     for (let u=parseFloat(document.getElementById("u_start").value); u<=parseFloat(document.getElementById("u_end").value); u+=1) {
         let w = p*u;
-        for (let v = parseFloat(document.getElementById("v_start").value); v <= parseFloat(document.getElementById("v_end").value); v+=0.01){
+        for (let v = parseFloat(document.getElementById("v_start").value); v <= parseFloat(document.getElementById("v_end").value); v+=0.1){
             vertexList.push((a+v)*Math.cos(deg2rad(w))*Math.cos(deg2rad(u))/6, (a+v)*Math.cos(deg2rad(w))*Math.sin(deg2rad(u))/6, (a+v)*Math.sin(deg2rad(w))/6);}
     }
 
