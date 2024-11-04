@@ -29,7 +29,7 @@ function Model(name) {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.iVertexBuffer);
         gl.vertexAttribPointer(shProgram.iAttribVertex, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(shProgram.iAttribVertex);
-   
+
         gl.drawArrays(gl.LINE_STRIP, 0, this.count);
     }
 }
@@ -58,13 +58,13 @@ function ShaderProgram(name, program) {
  * (Note that the use of the above drawPrimitive function is not an efficient
  * way to draw with WebGL.  Here, the geometry is so simple that it doesn't matter.)
  */
-function draw() { 
+function draw() {
     gl.clearColor(0,0,0,1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    
+
     /* Set the values of the projection transformation */
-    let projection = m4.perspective(Math.PI/8, 1, 8, 12); 
-    
+    let projection = m4.perspective(Math.PI/8, 1, 8, 12);
+
     /* Get the view matrix from the SimpleRotator object.*/
     let modelView = spaceball.getViewMatrix();
 
@@ -73,13 +73,13 @@ function draw() {
 
     let matAccum0 = m4.multiply(rotateToPointZero, modelView );
     let matAccum1 = m4.multiply(translateToPointZero, matAccum0 );
-        
+
     /* Multiply the projection matrix times the modelview matrix to give the
        combined transformation matrix, and send that to the shader program. */
     let modelViewProjection = m4.multiply(projection, matAccum1 );
 
     gl.uniformMatrix4fv(shProgram.iModelViewProjectionMatrix, false, modelViewProjection );
-    
+
     /* Draw the six faces of a cube, with different colors. */
     gl.uniform4fv(shProgram.iColor, [1,1,0,1] );
 
@@ -88,11 +88,13 @@ function draw() {
 
 function CreateSurfaceData()
 {
+    const p = 1;
+    const a = 2;
     let vertexList = [];
-
-    for (let i=0; i<360; i+=5) {
-        vertexList.push( Math.sin(deg2rad(i)), 1, Math.cos(deg2rad(i)) );
-        vertexList.push( Math.sin(deg2rad(i)), 0, Math.cos(deg2rad(i)) );
+    for (let u=-180; u<=180; u+=1) {
+        let w = p*u;
+        for (let v = -a; v <= 0; v+=0.01){
+            vertexList.push((a+v)*Math.cos(deg2rad(w))*Math.cos(deg2rad(u)), (a+v)*Math.cos(deg2rad(w))*Math.sin(deg2rad(u)), (a+v)*Math.cos(deg2rad(w)));}
     }
 
     return vertexList;
