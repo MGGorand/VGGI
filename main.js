@@ -9,32 +9,6 @@ function deg2rad(angle) {
     return angle * Math.PI / 180;
 }
 
-
-// Constructor
-function Model(name) {
-    this.name = name;
-    this.iVertexBuffer = gl.createBuffer();
-    this.count = 0;
-
-    this.BufferData = function(vertices) {
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.iVertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STREAM_DRAW);
-
-        this.count = vertices.length/3;
-    }
-
-    this.Draw = function() {
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.iVertexBuffer);
-        gl.vertexAttribPointer(shProgram.iAttribVertex, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(shProgram.iAttribVertex);
-
-        gl.drawArrays(gl.LINE_STRIP, 0, this.count);
-    }
-}
-
-
 // Constructor
 function ShaderProgram(name, program) {
 
@@ -93,8 +67,8 @@ function CreateSurfaceData()
     let vertexList = [];
     for (let u=parseFloat(document.getElementById("u_start").value); u<=parseFloat(document.getElementById("u_end").value); u+=1) {
         let w = p*u;
-        for (let v = u<=parseFloat(document.getElementById("v_start").value); v <= parseFloat(document.getElementById("v_end").value); v+=0.01){
-            vertexList.push((a+v)*Math.cos(deg2rad(w))*Math.cos(deg2rad(u)), (a+v)*Math.cos(deg2rad(w))*Math.sin(deg2rad(u)), (a+v)*Math.cos(deg2rad(w)));}
+        for (let v = parseFloat(document.getElementById("v_start").value); v <= parseFloat(document.getElementById("v_end").value); v+=0.01){
+            vertexList.push((a+v)*Math.cos(deg2rad(w))*Math.cos(deg2rad(u))/10, (a+v)*Math.cos(deg2rad(w))*Math.sin(deg2rad(u))/10, (a+v)*Math.sin(deg2rad(w))/10);}
     }
 
     return vertexList;
