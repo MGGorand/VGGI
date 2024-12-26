@@ -22,7 +22,27 @@
 <p id="message">Drag your mouse on the cube to rotate it.<br>
 (On a touch screen, you can use your finger.)</p>
 
-
+<div id="inputs">
+    <label for="a">a:</label>
+    <input type="number" id="a" name="a" value="1" onchange="initGL()">
+    <br>
+    <label for="p">p:</label>
+    <input type="number" id="p" name="p" value="1" onchange="initGL()">
+    <br>
+    <label for="u_start">u (from):</label>
+    <input type="number" id="u_start" name="u_start" value="-180" max="document.getElementById('u_end').value" onchange="initGL()">
+    <label for="u_end">u (to):</label>
+    <input type="number" id="u_end" name="u_end" value="180" min="document.getElementById('u_start').value" onchange="initGL()">
+    <label for="u_step">u (step):</label>
+    <input type="number" id="u_step" name="u_step" value="1" min="1" onchange="initGL()">
+    <br>
+    <label for="v_start">v (from):</label>
+    <input type="number" id="v_start" name="v_start" value="0" max="document.getElementById('v_end').value" onchange="initGL()">
+    <label for="v_end">v (to):</label>
+    <input type="number" id="v_end" name="v_end" value="4" min="document.getElementById('v_start').value" onchange="initGL()">
+    <label for="v_step">v (step):</label>
+    <input type="number" id="v_step" name="v_step" value="1" min="0.0001" onchange="initGL()">
+</div>
 <div id="canvas-holder">
    <canvas width="600" height="600" id="webglcanvas" style="background-color:red"></canvas>
 </div>

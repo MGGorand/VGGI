@@ -89,24 +89,30 @@ function draw() {
 function CreateSurfaceData()
 {
     let vertexList = [];
-    let a = 10;
-    let p = 1;
+    const a = parseFloat(document.getElementById("a").value);
+    const p = parseFloat(document.getElementById("p").value);
+    const u_start = deg2rad(parseFloat(document.getElementById("u_start").value));
+    const u_end = deg2rad(parseFloat(document.getElementById("u_end").value));
+    const u_step = deg2rad(parseFloat(document.getElementById("u_step").value));
+    const v_start = parseFloat(document.getElementById("v_start").value);
+    const v_end = parseFloat(document.getElementById("v_end").value);
+    const v_step = parseFloat(document.getElementById("v_step").value);
     let scaler = 6;
-    for (let u=-180; u<180; u+=5) {
+    for (let u=u_start; u<=u_end; u+=u_step) {
         let w = p*u;
-        for (let v=-a; v <0; v += 0.5){
-            let x = (a+v)*Math.cos(deg2rad(w))*Math.cos(deg2rad(u));
-            let y = (a+v)*Math.cos(deg2rad(w))*Math.sin(deg2rad(u));
-            let z = (a+v)*Math.sin(deg2rad(w));
+        for (let v=v_start; v <=v_end; v += v_step){
+            let x = (a+v)*Math.cos(w)*Math.cos(u);
+            let y = (a+v)*Math.cos(w)*Math.sin(u);
+            let z = (a+v)*Math.sin(w);
             vertexList.push(x/scaler,y/scaler,z/scaler);
         }
     }
-    for (let v=-a; v <0; v += 0.5){
-        for (let u=-180; u<180; u+=1){
+    for (let v=v_start; v <=v_end; v += v_step){
+        for (let u=u_start; u<=u_end; u+=u_step){
             let w = p*u;
-            let x = (a+v)*Math.cos(deg2rad(w))*Math.cos(deg2rad(u));
-            let y = (a+v)*Math.cos(deg2rad(w))*Math.sin(deg2rad(u));
-            let z = (a+v)*Math.sin(deg2rad(w));
+            let x = (a+v)*Math.cos(w)*Math.cos(u);
+            let y = (a+v)*Math.cos(w)*Math.sin(u);
+            let z = (a+v)*Math.sin(w);
             vertexList.push(x/scaler,y/scaler,z/scaler);
         }
     }
