@@ -9,6 +9,32 @@ function deg2rad(angle) {
     return angle * Math.PI / 180;
 }
 
+
+// Constructor
+function Model(name) {
+    this.name = name;
+    this.iVertexBuffer = gl.createBuffer();
+    this.count = 0;
+
+    this.BufferData = function(vertices) {
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iVertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STREAM_DRAW);
+
+        this.count = vertices.length/3;
+    }
+
+    this.Draw = function() {
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iVertexBuffer);
+        gl.vertexAttribPointer(shProgram.iAttribVertex, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(shProgram.iAttribVertex);
+
+        gl.drawArrays(gl.LINE_STRIP, 0, this.count);
+    }
+}
+
+
 // Constructor
 function ShaderProgram(name, program) {
 
@@ -62,15 +88,28 @@ function draw() {
 
 function CreateSurfaceData()
 {
-    let p = parseFloat(document.getElementById("p").value);
-    let a = parseFloat(document.getElementById("a").value);
     let vertexList = [];
-    for (let u=parseFloat(document.getElementById("u_start").value); u<=parseFloat(document.getElementById("u_end").value); u+=parseFloat(document.getElementById("u_step").value)) {
+    let a = 10;
+    let p = 1;
+    let scaler = 6;
+    for (let u=-180; u<180; u+=5) {
         let w = p*u;
-        for (let v = parseFloat(document.getElementById("v_start").value); v <= parseFloat(document.getElementById("v_end").value); v+=parseFloat(document.getElementById("v_step").value)){
-            vertexList.push((a+v)*Math.cos(deg2rad(w))*Math.cos(deg2rad(u))/6, (a+v)*Math.cos(deg2rad(w))*Math.sin(deg2rad(u))/6, (a+v)*Math.sin(deg2rad(w))/6);}
+        for (let v=-a; v <0; v += 0.5){
+            let x = (a+v)*Math.cos(deg2rad(w))*Math.cos(deg2rad(u));
+            let y = (a+v)*Math.cos(deg2rad(w))*Math.sin(deg2rad(u));
+            let z = (a+v)*Math.sin(deg2rad(w));
+            vertexList.push(x/scaler,y/scaler,z/scaler);
+        }
     }
-
+    for (let v=-a; v <0; v += 0.5){
+        for (let u=-180; u<180; u+=1){
+            let w = p*u;
+            let x = (a+v)*Math.cos(deg2rad(w))*Math.cos(deg2rad(u));
+            let y = (a+v)*Math.cos(deg2rad(w))*Math.sin(deg2rad(u));
+            let z = (a+v)*Math.sin(deg2rad(w));
+            vertexList.push(x/scaler,y/scaler,z/scaler);
+        }
+    }
     return vertexList;
 }
 
