@@ -13,7 +13,7 @@ function CreateSurfaceData()
     const v_start = parseFloat(document.getElementById("v_start").value);
     const v_end = parseFloat(document.getElementById("v_end").value);
     const v_step = parseFloat(document.getElementById("v_step").value);
-    let scaler = 6;
+    const scaler = 6;
     for (let u=u_start; u<=u_end; u+=u_step) {
         let w = p*u;
         for (let v=v_start; v <=v_end; v += v_step){
