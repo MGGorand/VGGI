@@ -55,7 +55,6 @@ function draw() {
     surface.Draw();
 }
 
-
 /* Initialize the WebGL context. Called from init() */
 function initGL() {
     let prog = createProgram( gl, vertexShaderSource, fragmentShaderSource );
