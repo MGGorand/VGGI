@@ -1,3 +1,7 @@
+function deg2rad(angle) {
+    return angle * Math.PI / 180;
+}
+
 function get(name) {
     return parseFloat(document.getElementById(name).value);
 }
@@ -56,8 +60,8 @@ function ModelBuilder() {
     const uSteps = get('USteps');
     const vSteps = get('VSteps');
 
-    const uMin = get('UMin');
-    const uMax = get('UMax');
+    const uMin = deg2rad(get('UMin'));
+    const uMax = deg2rad(get('UMax'));
 
     const vMin = get('VMin');
     const vMax = get('VMax');
