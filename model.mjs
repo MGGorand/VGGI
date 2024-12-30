@@ -1,5 +1,9 @@
 import LoadTexture from "./TextureHandler.mjs";
 
+function deg2rad(angle) {
+    return angle * Math.PI / 180;
+}
+
 function get(name) {
     return parseFloat(document.getElementById(name).value);
 }
@@ -98,12 +102,12 @@ function calculateNormalsAndTangents(vertices, indices, uvs) {
 function ModelBuilder() {
     const a = get('A');
     const p = get('P');
-    
+
     const uSteps = get('USteps');
     const vSteps = get('VSteps');
 
-    const uMin = get('UMin');
-    const uMax = get('UMax');
+    const uMin = deg2rad(get('UMin'));
+    const uMax = deg2rad(get('UMax'));
 
     const vMin = get('VMin');
     const vMax = get('VMax');
@@ -214,10 +218,10 @@ export default function Model(gl, shProgram) {
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.idTextureDiffuse);
-        
+
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, this.idTextureNormal);
-        
+
         gl.activeTexture(gl.TEXTURE2);
         gl.bindTexture(gl.TEXTURE_2D, this.idTextureSpecular);
 
