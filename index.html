@@ -1,50 +1,139 @@
 <!DOCTYPE html>
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conical Surface</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
 
-<title>PA#1</title>
-<style>
-    body {
-        background-color: #EEEEEE;
-    }
-</style>
+        body {
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-<script src="./Utils/trackball-rotator.js"></script>
-<script src="./Utils/m4.js"></script>
-<script src="./shader.gpu"></script>
-<script src="./main.js"></script>
-<script src="./Model.js"></script>
+        h2 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #222;
+        }
+
+        .inputContainer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            padding: 5px 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            border-color: #007bff;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #canvas-holder {
+            margin-top: 20px;
+            width: 700px;
+            height: 700px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+    </style>
 </head>
-<body onload="init()">
 
-<h2>A Cube with "Trackball" Mouse Rotation</h2>
+<body>
+    <h2>Conical Surface with a Directrix Curve on a Sphere</h2>
+    <div class="inputContainer">
+        <p>U Min:</p>
+        <input type="number" name="UMin" id="UMin" min="-5" max="5" step="0.1" value="-3.1415" onchange="update()">
 
-<p id="message">Drag your mouse on the cube to rotate it.<br>
-(On a touch screen, you can use your finger.)</p>
+        <p>U Max:</p>
+        <input type="number" name="UMax" id="UMax" min="-5" max="5" step="0.1" value="3.1415" onchange="update()">
+    </div>
 
-<div id="inputs">
-    <label for="a">a:</label>
-    <input type="number" id="a" name="a" value="1" onchange="initGL()">
-    <br>
-    <label for="p">p:</label>
-    <input type="number" id="p" name="p" value="1" onchange="initGL()">
-    <br>
-    <label for="u_start">u (from):</label>
-    <input type="number" id="u_start" name="u_start" value="-180" max="document.getElementById('u_end').value" onchange="initGL()">
-    <label for="u_end">u (to):</label>
-    <input type="number" id="u_end" name="u_end" value="180" min="document.getElementById('u_start').value" onchange="initGL()">
-    <label for="u_step">u (step):</label>
-    <input type="number" id="u_step" name="u_step" value="1" min="1" onchange="initGL()">
-    <br>
-    <label for="v_start">v (from):</label>
-    <input type="number" id="v_start" name="v_start" value="0" max="document.getElementById('v_end').value" onchange="initGL()">
-    <label for="v_end">v (to):</label>
-    <input type="number" id="v_end" name="v_end" value="4" min="document.getElementById('v_start').value" onchange="initGL()">
-    <label for="v_step">v (step):</label>
-    <input type="number" id="v_step" name="v_step" value="1" min="0.0001" onchange="initGL()">
-</div>
-<div id="canvas-holder">
-   <canvas width="600" height="600" id="webglcanvas" style="background-color:red"></canvas>
-</div>
+    <div class="inputContainer">
+        <p>V Min:</p>
+        <input type="number" name="VMin" id="VMin" min="-10" max="10" step="0.1" value="-2" onchange="update()">
 
-</body></html>
+        <p>V Max:</p>
+        <input type="number" name="VMax" id="VMax" min="-10" max="10" step="0.1" value="0" onchange="update()">
+    </div>
+
+    <div class="inputContainer">
+        <p>U Steps:</p>
+        <input type="number" name="USteps" id="USteps" min="2" max="100" step="1" value="100" onchange="update()">
+
+        <p>V Steps:</p>
+        <input type="number" name="VSteps" id="VSteps" min="2" max="100" step="1" value="100" onchange="update()">
+    </div>
+
+    <div class="inputContainer">
+        <p>A:</p>
+        <input type="number" name="A" id="A" min="0" max="20" step="0.1" value="2">
+
+        <p>P:</p>
+        <input type="number" name="P" id="P" min="0" max="20" step="0.1" value="1">
+    </div>
+
+    <div id="canvas-holder">
+        <canvas id="webglcanvas" width="700" height="700"></canvas>
+    </div>
+
+    <script defer type="module" src="./main.mjs"></script>
+    <script src="./shader.gpu"></script>
+    <script src="./Utils/m4.js"></script>
+</body>
+
+</html>
