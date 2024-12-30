@@ -40,8 +40,10 @@ function draw() {
     gl.uniformMatrix4fv(shProgram.iProjectionMatrix, false, projection);
     gl.uniformMatrix4fv(shProgram.iModelMatrix, false, modelMatrix);
     gl.uniformMatrix4fv(shProgram.iNormalMatrix, false, normalMatrix)
-    gl.uniform3fv(shProgram.iColor, [0.7, 0.2, 0.1]);
     gl.uniform3fv(shProgram.iLightLocation, [5.0, 5.0, 5.0])
+    gl.uniform1i(shProgram.iDiffuseTexture, 0);
+    gl.uniform1i(shProgram.iNormalTexture, 1);
+    gl.uniform1i(shProgram.iSpecularTexture, 2);
 
     surface.Draw();
 }
@@ -55,12 +57,17 @@ function initGL() {
 
     shProgram.iAttribVertex = gl.getAttribLocation(prog, "inVertex");
     shProgram.iAttribNormal = gl.getAttribLocation(prog, "inNormal");
-
+    shProgram.iAttribTangent = gl.getAttribLocation(prog, "inTangent");
+    shProgram.iAttribUV = gl.getAttribLocation(prog, "inUV");
+    
     shProgram.iProjectionMatrix = gl.getUniformLocation(prog, "projectionMatrix");
     shProgram.iModelMatrix = gl.getUniformLocation(prog, "modelMatrix");
     shProgram.iNormalMatrix = gl.getUniformLocation(prog, "normalMatrix");
-    shProgram.iColor = gl.getUniformLocation(prog, "color");
     shProgram.iLightLocation = gl.getUniformLocation(prog, "lightLocation");
+
+    shProgram.iDiffuseTexture = gl.getUniformLocation(prog, "diffuseTexture");
+    shProgram.iNormalTexture = gl.getUniformLocation(prog, "normalTexture");
+    shProgram.iSpecularTexture = gl.getUniformLocation(prog, "specularTexture");
 
     surface = new Model(gl, shProgram);
     surface.CreateSurfaceData();
@@ -113,7 +120,7 @@ document.getElementById('USteps').addEventListener('change', update);
 document.getElementById('VSteps').addEventListener('change', update);
 document.getElementById('A').addEventListener('change', update);
 document.getElementById('P').addEventListener('change', update);
-
+document.addEventListener('draw', draw);
 
 /* Initialize the app */
 function init() {
@@ -130,7 +137,7 @@ function init() {
     }
 
     try {
-        initGL();
+        initGL();        
     } catch (e) {
         document.getElementById("canvas-holder").innerHTML =
             "<p>Sorry, could not initialize the WebGL graphics context: " + e + "</p>";
