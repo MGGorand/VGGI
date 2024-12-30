@@ -23,7 +23,7 @@ void main() {
 
     vec3 N = normalize(mat3(normalMatrix) * inNormal);
     vec3 L = normalize(vertex.xyz - lightLocation);
-    vec3 V = normalize(-vertex.xyz); 
+    vec3 V = normalize(-vertex.xyz);
 
     if( dot(N, V) < 0.0) {
         N = -N;
@@ -44,8 +44,8 @@ void main() {
 const fragmentShaderSource = `#version 300 es
 precision highp float;
 
-flat in vec3 fragColor;    
-out vec4 outColor;   
+flat in vec3 fragColor;
+out vec4 outColor;
 
 void main() {
     outColor = vec4(fragColor, 1.0);

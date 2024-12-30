@@ -40,7 +40,7 @@ function draw() {
     gl.uniformMatrix4fv(shProgram.iProjectionMatrix, false, projection);
     gl.uniformMatrix4fv(shProgram.iModelMatrix, false, modelMatrix);
     gl.uniformMatrix4fv(shProgram.iNormalMatrix, false, normalMatrix)
-    gl.uniform3fv(shProgram.iColor, [0.7, 0.0, 0.0]);
+    gl.uniform3fv(shProgram.iColor, [0.7, 0.2, 0.1]);
     gl.uniform3fv(shProgram.iLightLocation, [5.0, 5.0, 5.0])
 
     surface.Draw();
@@ -55,7 +55,7 @@ function initGL() {
 
     shProgram.iAttribVertex = gl.getAttribLocation(prog, "inVertex");
     shProgram.iAttribNormal = gl.getAttribLocation(prog, "inNormal");
-    
+
     shProgram.iProjectionMatrix = gl.getUniformLocation(prog, "projectionMatrix");
     shProgram.iModelMatrix = gl.getUniformLocation(prog, "modelMatrix");
     shProgram.iNormalMatrix = gl.getUniformLocation(prog, "normalMatrix");
@@ -130,7 +130,7 @@ function init() {
     }
 
     try {
-        initGL();    
+        initGL();
     } catch (e) {
         document.getElementById("canvas-holder").innerHTML =
             "<p>Sorry, could not initialize the WebGL graphics context: " + e + "</p>";

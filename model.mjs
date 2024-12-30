@@ -7,7 +7,6 @@ function get(name) {
 }
 
 function calculateNormals(vertices, indices) {
-    const vertexCount = vertices.length / 3;
     const normals = new Float32Array(vertices.length).fill(0);
 
     for (let i = 0; i < indices.length; i += 3) {
