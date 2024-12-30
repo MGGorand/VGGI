@@ -22,22 +22,29 @@ flat out vec3 fragColor;
 
 vec3 getWorldSpaceNormal()
 {
+    //Обчислення нормалі та дотичної у світових координатах
     vec3 normal = normalize(mat3(normalMatrix) * inNormal);
     vec3 tangent = normalize(mat3(normalMatrix) * inTangent);
 
+    //Ортогоналізація нормальні та дотичної
     normal = normalize(normal - dot(tangent, normal) * tangent);
 
+    //Рахуємо другу дотичну(векторний добуток)
     vec3 bitangent = cross(tangent, normal);
+    //Отримуємо вектор з текстури
     vec3 normalMap = texture(normalTexture, inUV).rgb;
     normalMap = 2.0 * normalMap - vec3(1.0, 1.0, 1.0);
 
+    //TBN матриця для перетворення нормалі
     mat3 TBN = mat3(tangent, bitangent, normal);
     return normalize(TBN * normalMap);
 }
 
 void main() {
     const float ambientFactor = 0.2;
+    //Колір обчислюється на основі текстури та текстурних координат
     vec3 color = texture(diffuseTexture, inUV).rgb;
+    //Коефіцієнт береться з текстури
     float specularFactor = pow(texture(specularTexture, inUV).r, 2.0);
 
     vec4 vertex = modelMatrix * vec4(inVertex, 1.0);
@@ -65,8 +72,8 @@ void main() {
 const fragmentShaderSource = `#version 300 es
 precision highp float;
 
-flat in vec3 fragColor;    
-out vec4 outColor;   
+flat in vec3 fragColor;
+out vec4 outColor;
 
 void main() {
     outColor = vec4(fragColor, 1.0);
