@@ -1,11 +1,13 @@
 'use strict';
 import Model from "./model.mjs";
 import TrackballRotator from "./Utils/trackball-rotator.mjs";
+import TexCoordDrawer from "./TexCoord.mjs"
 
 let gl;                         // The webgl context.
 let surface;                    // A surface model
 let shProgram;                  // A shader program
 let spaceball;                  // A SimpleRotator object that lets the user rotate the view by mouse.
+let uvDrawer;
 
 let zoomFactor = -15;
 
@@ -16,6 +18,15 @@ function ShaderProgram(program) {
     this.Use = function() {
         gl.useProgram(this.prog);
     }
+}
+
+function getLightLocation() {
+
+    const angle = parseFloat(document.getElementById("LAngle").value) * Math.PI / 180.0;
+    const radius = 10.0;
+    const x = Math.sin(angle) * radius;
+    const y = Math.cos(angle) * radius;    
+    return [x, radius, y];
 }
 
 /* Draws the scene */
@@ -40,10 +51,13 @@ function draw() {
     gl.uniformMatrix4fv(shProgram.iProjectionMatrix, false, projection);
     gl.uniformMatrix4fv(shProgram.iModelMatrix, false, modelMatrix);
     gl.uniformMatrix4fv(shProgram.iNormalMatrix, false, normalMatrix)
-    gl.uniform3fv(shProgram.iColor, [0.7, 0.2, 0.1]);
-    gl.uniform3fv(shProgram.iLightLocation, [5.0, 5.0, 5.0])
+    gl.uniform3fv(shProgram.iLightLocation, getLightLocation())
+    gl.uniform1i(shProgram.iDiffuseTexture, 0);
+    gl.uniform1i(shProgram.iNormalTexture, 1);
+    gl.uniform1i(shProgram.iSpecularTexture, 2);
 
     surface.Draw();
+    uvDrawer.draw();
 }
 
 /* Initialize the WebGL context */
@@ -55,12 +69,20 @@ function initGL() {
 
     shProgram.iAttribVertex = gl.getAttribLocation(prog, "inVertex");
     shProgram.iAttribNormal = gl.getAttribLocation(prog, "inNormal");
-
+    shProgram.iAttribTangent = gl.getAttribLocation(prog, "inTangent");
+    shProgram.iAttribUV = gl.getAttribLocation(prog, "inUV");
+    
     shProgram.iProjectionMatrix = gl.getUniformLocation(prog, "projectionMatrix");
     shProgram.iModelMatrix = gl.getUniformLocation(prog, "modelMatrix");
     shProgram.iNormalMatrix = gl.getUniformLocation(prog, "normalMatrix");
-    shProgram.iColor = gl.getUniformLocation(prog, "color");
     shProgram.iLightLocation = gl.getUniformLocation(prog, "lightLocation");
+
+    shProgram.iDiffuseTexture = gl.getUniformLocation(prog, "diffuseTexture");
+    shProgram.iNormalTexture = gl.getUniformLocation(prog, "normalTexture");
+    shProgram.iSpecularTexture = gl.getUniformLocation(prog, "specularTexture");
+
+    shProgram.iPoint = gl.getUniformLocation(prog, "point");
+    shProgram.iAngle = gl.getUniformLocation(prog, "angle");
 
     surface = new Model(gl, shProgram);
     surface.CreateSurfaceData();
@@ -96,6 +118,7 @@ function createProgram(gl, vShader, fShader) {
 
 function update(){
     surface.CreateSurfaceData();
+    uvDrawer.update();
     draw();
 }
 
@@ -113,7 +136,9 @@ document.getElementById('USteps').addEventListener('change', update);
 document.getElementById('VSteps').addEventListener('change', update);
 document.getElementById('A').addEventListener('change', update);
 document.getElementById('P').addEventListener('change', update);
-
+document.getElementById('LAngle').addEventListener('input', draw);
+document.getElementById('Angle').addEventListener('input', draw);
+document.addEventListener('draw', draw);
 
 /* Initialize the app */
 function init() {
@@ -130,7 +155,7 @@ function init() {
     }
 
     try {
-        initGL();
+        initGL();        
     } catch (e) {
         document.getElementById("canvas-holder").innerHTML =
             "<p>Sorry, could not initialize the WebGL graphics context: " + e + "</p>";
@@ -138,6 +163,8 @@ function init() {
     }
 
     spaceball = new TrackballRotator(canvas, draw, 0);
+    uvDrawer = new TexCoordDrawer(surface);
+    uvDrawer.init();
 
     draw();
 }
