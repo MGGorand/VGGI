@@ -57,7 +57,8 @@ function draw() {
     gl.uniform1i(shProgram.iSpecularTexture, 2);
 
     surface.Draw();
-    uvDrawer.draw();
+    if(uvDrawer)
+        uvDrawer.draw();
 }
 
 /* Initialize the WebGL context */
@@ -67,22 +68,22 @@ function initGL() {
     shProgram = new ShaderProgram(prog);
     shProgram.Use();
 
-    shProgram.iAttribVertex = gl.getAttribLocation(prog, "inVertex");
-    shProgram.iAttribNormal = gl.getAttribLocation(prog, "inNormal");
-    shProgram.iAttribTangent = gl.getAttribLocation(prog, "inTangent");
-    shProgram.iAttribUV = gl.getAttribLocation(prog, "inUV");
+    shProgram.iAttribVertex = gl.getAttribLocation(prog, "position");
+    shProgram.iAttribNormal = gl.getAttribLocation(prog, "normal");
+    shProgram.iAttribTangent = gl.getAttribLocation(prog, "tangent");
+    shProgram.iAttribUV = gl.getAttribLocation(prog, "texCoord");
     
-    shProgram.iProjectionMatrix = gl.getUniformLocation(prog, "projectionMatrix");
-    shProgram.iModelMatrix = gl.getUniformLocation(prog, "modelMatrix");
-    shProgram.iNormalMatrix = gl.getUniformLocation(prog, "normalMatrix");
-    shProgram.iLightLocation = gl.getUniformLocation(prog, "lightLocation");
+    shProgram.iProjectionMatrix = gl.getUniformLocation(prog, "projMatrix");
+    shProgram.iModelMatrix = gl.getUniformLocation(prog, "modelMat");
+    shProgram.iNormalMatrix = gl.getUniformLocation(prog, "normalMat");
+    shProgram.iLightLocation = gl.getUniformLocation(prog, "lightPos");
 
-    shProgram.iDiffuseTexture = gl.getUniformLocation(prog, "diffuseTexture");
-    shProgram.iNormalTexture = gl.getUniformLocation(prog, "normalTexture");
-    shProgram.iSpecularTexture = gl.getUniformLocation(prog, "specularTexture");
+    shProgram.iDiffuseTexture = gl.getUniformLocation(prog, "texDiffuse");
+    shProgram.iNormalTexture = gl.getUniformLocation(prog, "texNormal");
+    shProgram.iSpecularTexture = gl.getUniformLocation(prog, "texSpecular");
 
-    shProgram.iPoint = gl.getUniformLocation(prog, "point");
-    shProgram.iAngle = gl.getUniformLocation(prog, "angle");
+    shProgram.iPoint = gl.getUniformLocation(prog, "pivot");
+    shProgram.iAngle = gl.getUniformLocation(prog, "rotation");
 
     surface = new Model(gl, shProgram);
     surface.CreateSurfaceData();
@@ -91,7 +92,7 @@ function initGL() {
 }
 
 /* Creates a program */
-function createProgram(gl, vShader, fShader) {
+export default function createProgram(gl, vShader, fShader) {
     let vsh = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vsh, vShader);
     gl.compileShader(vsh);

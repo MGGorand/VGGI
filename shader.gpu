@@ -1,89 +1,82 @@
-
-
-// Vertex shader
+// Vertex Shader
 const vertexShaderSource = `#version 300 es
 
-in vec3 inVertex;
-in vec3 inNormal;
-in vec3 inTangent;
-in vec2 inUV;
+in vec3 position;
+in vec3 normal;
+in vec3 tangent;
+in vec2 texCoord;
 
-uniform mat4 projectionMatrix;
-uniform mat4 modelMatrix;
-uniform mat4 normalMatrix;
+uniform mat4 projMatrix;
+uniform mat4 modelMat;
+uniform mat4 normalMat;
 
-uniform vec3 lightLocation;
+uniform vec3 lightPos;
 
-uniform sampler2D diffuseTexture;
-uniform sampler2D normalTexture;
-uniform sampler2D specularTexture;
-uniform vec2 point;
-uniform float angle;
+uniform sampler2D texDiffuse;
+uniform sampler2D texNormal;
+uniform sampler2D texSpecular;
 
-flat out vec3 fragColor;
+uniform vec2 pivot;
+uniform float rotation;
 
-vec2 getUV() {
-    vec2 uv = inUV - point;
-    float cosTheta = cos(angle);
-    float sinTheta = sin(angle);
+flat out vec3 finalColor;
 
+vec2 rotateUV(vec2 uv, vec2 center, float angle) {
+    uv -= center;
+    float c = cos(angle);
+    float s = sin(angle);
     uv = vec2(
-        uv.x * cosTheta - uv.y * sinTheta,
-        uv.x * sinTheta + uv.y * cosTheta
+        uv.x * c - uv.y * s,
+        uv.x * s + uv.y * c
     );
-
-    return uv + point;
+    return uv + center;
 }
 
-vec3 getWorldSpaceNormal(vec2 uv)
-{
-    vec3 normal = normalize(mat3(normalMatrix) * inNormal);
-    vec3 tangent = normalize(mat3(normalMatrix) * inTangent);
+vec3 computeWorldNormal(vec2 uvCoord) {
+    vec3 baseNormal = normalize(mat3(normalMat) * normal);
+    vec3 baseTangent = normalize(mat3(normalMat) * tangent);
+    baseNormal = normalize(baseNormal - dot(baseTangent, baseNormal) * baseTangent);
 
-    normal = normalize(normal - dot(tangent, normal) * tangent);
+    vec3 bitangent = cross(baseTangent, baseNormal);
+    vec3 sampledNormal = texture(texNormal, uvCoord).rgb * 2.0 - 1.0;
 
-    vec3 bitangent = cross(tangent, normal);
-    vec3 normalMap = texture(normalTexture, uv).rgb;
-    normalMap = 2.0 * normalMap - vec3(1.0, 1.0, 1.0);
-
-    mat3 TBN = mat3(tangent, bitangent, normal);
-    return normalize(TBN * normalMap);
+    mat3 tbnMatrix = mat3(baseTangent, bitangent, baseNormal);
+    return normalize(tbnMatrix * sampledNormal);
 }
 
 void main() {
-    const float ambientFactor = 0.2;
-    vec2 uv = getUV();
-    vec3 color = texture(diffuseTexture, uv).rgb;
-    float specularFactor = pow(texture(specularTexture, uv).r, 2.0);
+    float ambientIntensity = 0.2;
+    vec2 uv = rotateUV(texCoord, pivot, rotation);
+    vec3 surfaceColor = texture(texDiffuse, uv).rgb;
+    float specularPower = pow(texture(texSpecular, uv).r, 2.0);
 
-    vec4 vertex = modelMatrix * vec4(inVertex, 1.0);
-    vertex /= vertex.w;
+    vec4 transformedVertex = modelMat * vec4(position, 1.0);
+    vec3 worldPos = transformedVertex.xyz / transformedVertex.w;
 
-    vec3 N = getWorldSpaceNormal(uv);
-    vec3 L = normalize(vertex.xyz - lightLocation);
-    vec3 V = normalize(-vertex.xyz);
+    vec3 norm = computeWorldNormal(uv);
+    vec3 lightDir = normalize(worldPos - lightPos);
+    vec3 viewDir = normalize(-worldPos);
 
-    if( dot(N, V) < 0.0) {
-        N = -N;
+    if (dot(norm, viewDir) < 0.0) {
+        norm = -norm;
     }
 
-    vec3 ambient = color * ambientFactor;
-    vec3 diffuse = vec3(max(dot(N, -L), 0.0)) * color * (1.0 - ambientFactor);
-    vec3 R = reflect(L, N);
-    vec3 specular = vec3(specularFactor) * pow(max(dot(V, R), 0.0), 32.0);
+    vec3 ambient = surfaceColor * ambientIntensity;
+    vec3 diffuse = max(dot(norm, -lightDir), 0.0) * surfaceColor * (1.0 - ambientIntensity);
+    vec3 reflectDir = reflect(lightDir, norm);
+    vec3 specular = vec3(specularPower) * pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
-    fragColor = ambient + diffuse + specular;
-    gl_Position = projectionMatrix * vertex;
+    finalColor = ambient + diffuse + specular;
+    gl_Position = projMatrix * transformedVertex;
 }`;
 
-
-// Fragment shader
+// Fragment Shader
 const fragmentShaderSource = `#version 300 es
 precision highp float;
 
-flat in vec3 fragColor;    
-out vec4 outColor;   
+flat in vec3 finalColor;
+out vec4 fragOutput;
 
 void main() {
-    outColor = vec4(fragColor, 1.0);
+    fragOutput = vec4(finalColor, 1.0);
 }`;
